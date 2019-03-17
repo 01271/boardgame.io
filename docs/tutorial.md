@@ -33,6 +33,8 @@ object that contains metadata like `turn` and `currentPlayer`.
 Everything after that is an argument that you pass in at the
 call-site of this move.
 
+Replace the contents of src/App.js with the following:
+
 ```js
 // src/App.js
 
@@ -56,82 +58,6 @@ export default App;
 
 !> The move function can receive any number of additional
 arguments that are passed to it from the call-site.
-
-Run the app using:
-
-```
-npm start
-```
-
-```react
-<iframe class='react' src='react/example-1.html' height='800' scrolling='no' title='example' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 100%;'></iframe>
-```
-
-Notice that we have a fully playable game that we can
-interact with via the Debug UI with just this little piece of code!
-
-?> You can make a move by clicking on `clickCell` on the
-Debug UI (or pressing the keyboard shortcut `c`),
-entering `0` as an argument and pressing
-`Enter` to have the current player make a move on the 0-th
-cell. This `id` is available inside the move function as
-the first argument after `G` and `ctx`. Notice how the
-`cells` array now has a `0` in the 0-th position. You
-can end the turn using `endTurn` and the next call to
-`clickCell` will result in a `1` in the chosen cell.
-
-!> The Debug UI can be turned off by passing `debug: false`
-in the `Client` config.
-
-## Add Victory Condition
-
-The Tic-Tac-Toe game we have so far doesn't really terminate.
-Let's keep track of a winner in case one player wins the game.
-Let's also prevent players from being able to overwrite cells.
-
-In order to do this, we add a `flow` section to control the
-"flow" of the game. In this case, we just add a game termination
-condition to it.
-
-```js
-// Return true if `cells` is in a winning configuration.
-function IsVictory(cells) {
-  ...
-}
-
-// Return true if all `cells` are occupied.
-function IsDraw(cells) {
-  return cells.filter(c => c === null).length == 0;
-}
-
-const TicTacToe = Game({
-  setup: () => ({ cells: Array(9).fill(null) }),
-
-  moves: {
-    clickCell(G, ctx, id) {
-      // Ensure that we can't overwrite cells.
-      if (G.cells[id] === null) {
-        G.cells[id] = ctx.currentPlayer;
-      }
-    },
-  },
-
-  flow: {
-    endGameIf: (G, ctx) => {
-      if (IsVictory(G.cells)) {
-        return { winner: ctx.currentPlayer };
-      }
-      if (IsDraw(G.cells)) {
-        return { draw: true };
-      }
-    },
-  },
-});
-```
-
-!> The `endGameIf` field takes a function that determines if
-the game is over. If it returns anything at all, the game ends and
-the return value is available at `ctx.gameover`.
 
 ## Render Board
 
@@ -238,7 +164,78 @@ const App = Client({
 export default App;
 ```
 
-And there you have it. A basic tic-tac-toe game!
+
+Run the app using:
+
+```
+npm start
+```
+
+Notice that we have a fully playable game that we can
+interact with via the Debug UI with just this little piece of code!
+
+?> You can make a move by clicking on `clickCell` on the
+Debug UI (or pressing the keyboard shortcut `c`),
+entering `0` as an argument and pressing
+`Enter` to have the current player make a move on the 0-th
+cell. This `id` is available inside the move function as
+the first argument after `G` and `ctx`. Notice how the
+`cells` array now has a `0` in the 0-th position. You
+can end the turn using `endTurn` and the next call to
+`clickCell` will result in a `1` in the chosen cell.
+
+!> The Debug UI can be turned off by passing `debug: false`
+in the `Client` config.
+
+## Add Victory Condition
+
+The Tic-Tac-Toe game we have so far doesn't really terminate.
+Let's keep track of a winner in case one player wins the game.
+Let's also prevent players from being able to overwrite cells.
+
+In order to do this, we add a `flow` section to control the
+"flow" of the game. In this case, we just add a game termination
+condition to it.
+
+```js
+// Return true if `cells` is in a winning configuration.
+function IsVictory(cells) {
+  ...
+}
+
+// Return true if all `cells` are occupied.
+function IsDraw(cells) {
+  return cells.filter(c => c === null).length == 0;
+}
+
+const TicTacToe = Game({
+  setup: () => ({ cells: Array(9).fill(null) }),
+
+  moves: {
+    clickCell(G, ctx, id) {
+      // Ensure that we can't overwrite cells.
+      if (G.cells[id] === null) {
+        G.cells[id] = ctx.currentPlayer;
+      }
+    },
+  },
+
+  flow: {
+    endGameIf: (G, ctx) => {
+      if (IsVictory(G.cells)) {
+        return { winner: ctx.currentPlayer };
+      }
+      if (IsDraw(G.cells)) {
+        return { draw: true };
+      }
+    },
+  },
+});
+```
+
+!> The `endGameIf` field takes a function that determines if
+the game is over. If it returns anything at all, the game ends and
+the return value is available at `ctx.gameover`.
 
 ```react
 <iframe class='react' src='react/example-2.html' height='850' scrolling='no' title='example' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 100%;'></iframe>
